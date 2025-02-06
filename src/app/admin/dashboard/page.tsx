@@ -13,16 +13,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { createClient } from "next-sanity";
 import { ShoppingBag, Package, Star, Truck, Clock } from "lucide-react";
 import Loader from "@/components/loader";
+import { sanityClient } from "@/lib/sanity";
 
-export const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-  apiVersion: "2023-01-01",
-  useCdn: false,
-});
 
 type DashboardData = {
   totalProducts: number;
