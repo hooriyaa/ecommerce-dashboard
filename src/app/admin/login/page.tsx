@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     setTimeout(() => {
-      if (data.email === "parih3080@gmail.com" && data.password === "Hooriya#1234") {
+      if (data.email === "adminDashboard123@gmail.com" && data.password === "Hooriya#1234") {
         toast.success("Login successful! Redirecting...");
         setTimeout(() => (window.location.href = "/admin/dashboard"), 1500);
       } else {
