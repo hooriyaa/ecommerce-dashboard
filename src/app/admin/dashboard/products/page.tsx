@@ -133,14 +133,14 @@ const ProductPage = () => {
 
   return (
     <motion.div className="p-6 bg-gray-50 min-h-screen">
-      <motion.div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-        <h1 className="text-3xl text-[#007580] font-semibold">Products</h1>
-        <Link href="/admin/dashboard/add_Product">
-          <motion.button className="bg-[#029FAE] text-white px-4 py-2 flex items-center hover:bg-[#007580] rounded-xl">
-            <Plus className="mr-2" /> Add Product
-          </motion.button>
-        </Link>
-      </motion.div>
+    <motion.div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 text-center sm:text-left">
+      <h1 className="text-3xl text-[#007580] font-semibold">Products</h1>
+      <Link href="/admin/dashboard/add_Product" className="w-full sm:w-auto">
+        <motion.button className="bg-[#029FAE] text-white px-4 py-2 flex items-center justify-center w-full sm:w-auto hover:bg-[#007580] rounded-xl transition-all duration-300">
+          <Plus className="mr-2" /> Add Product
+        </motion.button>
+      </Link>
+    </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
@@ -167,38 +167,57 @@ const ProductPage = () => {
                     <DialogTrigger asChild>
                       <Button
                         onClick={() => setEditingProduct(product)}
-                        className="border-[#007580] hover:bg-[#007580] hover:text-white"
+                        className="border-[#007580] text-[#007580] hover:bg-[#007580] hover:text-white transition-all duration-300 px-4 py-2 rounded-lg"
                       >
                         <Pencil className="w-4 h-4 mr-1" /> Edit
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
-                      <form onSubmit={handleSubmit(handleSave)}>
+                    <DialogContent className="bg-white p-6 sm:p-4 rounded-lg shadow-lg max-w-lg sm:max-w-sm w-full">
+                      <h2 className="text-2xl sm:text-xl font-semibold text-[#007580] mb-4">
+                        Edit Product
+                      </h2>
+                      <form
+                        onSubmit={handleSubmit(handleSave)}
+                        className="flex flex-col gap-4"
+                      >
                         <Input
                           type="number"
                           placeholder="ID"
                           {...register("id")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
                         />
-                        <Input placeholder="Title" {...register("title")} />
+                        <Input
+                          placeholder="Title"
+                          {...register("title")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
+                        />
                         <Input
                           type="number"
                           placeholder="Price"
                           {...register("price")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
                         />
                         <Input
                           type="number"
                           placeholder="Price Without Discount"
                           {...register("priceWithoutDiscount")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
                         />
-                        <Input placeholder="Badge" {...register("badge")} />
+                        <Input
+                          placeholder="Badge"
+                          {...register("badge")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
+                        />
                         <Textarea
                           placeholder="Description"
                           {...register("description")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
                         />
                         <Input
                           type="number"
                           placeholder="Inventory"
                           {...register("inventory")}
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
                         />
                         <input
                           type="file"
@@ -206,16 +225,18 @@ const ProductPage = () => {
                             setImageFile(e.target.files?.[0] || null)
                           }
                           accept="image/*"
+                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580] bg-white"
                         />
                         <Button
                           type="submit"
-                          className="bg-[#F5813F] text-white w-full"
+                          className="bg-[#F5813F] text-white w-full py-2 rounded-lg hover:bg-[#d66a2e] transition-all duration-300"
                         >
                           Update Product
                         </Button>
                       </form>
                     </DialogContent>
                   </Dialog>
+
                   <Button
                     onClick={() => deleteProduct(product._id)}
                     className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"

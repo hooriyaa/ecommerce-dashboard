@@ -78,8 +78,8 @@ export default function ReviewsPage() {
         >
           Customer Reviews
         </motion.h1>
-        
-        {/* Review Table */}
+
+        {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
           <Table className="w-full border-collapse">
             <TableHeader>
@@ -119,25 +119,21 @@ export default function ReviewsPage() {
                     </TableCell>
                     <TableCell className="px-4 py-2">
                       <div className="flex gap-4">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="flex items-center text-[#007580] border-[#007580] hover:bg-[#007580] hover:text-white transition-all duration-200 px-3 py-1 rounded-md border"
+                        <Button
                           onClick={() => {
                             setEditingReview(review);
                             setIsDialogOpen(true);
                           }}
+                          className="bg-[#007580] text-white px-3 py-1 rounded-md flex items-center gap-2"
                         >
-                          <Pencil className="w-4 h-4 mr-1" /> Edit
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="flex items-center border-red-600 text-red-600 border hover:bg-red-600 hover:text-white transition-all duration-200 px-3 py-1 rounded-md"
+                          <Pencil className="w-4 h-4" /> Edit
+                        </Button>
+                        <Button
                           onClick={() => handleDelete(review._id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded-md flex items-center gap-2"
                         >
-                          <Trash className="w-4 h-4 mr-1" /> Delete
-                        </motion.button>
+                          <Trash className="w-4 h-4" /> Delete
+                        </Button>
                       </div>
                     </TableCell>
                   </motion.tr>
@@ -145,6 +141,46 @@ export default function ReviewsPage() {
               </AnimatePresence>
             </TableBody>
           </Table>
+        </div>
+
+        {/* Mobile View - Cards */}
+        <div className="md:hidden flex flex-col gap-4">
+          {reviews.map((review) => (
+            <Card key={review._id} className="p-4 shadow-md rounded-lg border">
+              <CardContent className="flex flex-col gap-2">
+                <h2 className="text-lg font-semibold">{review.user}</h2>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < review.rating ? "fill-[#F5813F] text-[#F5813F]" : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-gray-700">{review.comment}</p>
+                <p className="text-sm text-gray-500">{new Date(review.date).toLocaleDateString()}</p>
+                <div className="flex gap-3 mt-2">
+                  <Button
+                    onClick={() => {
+                      setEditingReview(review);
+                      setIsDialogOpen(true);
+                    }}
+                    className="bg-[#2b8f98] text-white flex items-center gap-2 px-3 py-1 rounded-md"
+                  >
+                    <Pencil className="w-4 h-4" /> Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(review._id)}
+                    className="bg-red-600 text-white flex items-center gap-2 px-3 py-1 rounded-md"
+                  >
+                    <Trash className="w-4 h-4" /> Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </CardContent>
 
