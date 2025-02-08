@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "next-sanity";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer } from "react-toastify";
 import { FaPlus, FaSave, FaImage, FaTag, FaDollarSign, FaListAlt, FaInfoCircle, FaIdCard } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -31,7 +32,7 @@ const AddProductPage = () => {
     inventory: number;
   }
 
-  const handleSave = async (data:ProductFormData) => {
+  const handleSave = async (data: ProductFormData) => {
     try {
       let imageRef = null;
       if (imageFile) {
@@ -50,21 +51,27 @@ const AddProductPage = () => {
         inventory: Number(data.inventory),
         image: imageRef ? { asset: { _ref: imageRef } } : null,
       });
-
-      toast.success("Product added successfully");
+      toast.success("Product saved successfully!");
       reset();
       setImageFile(null);
     } catch (error) {
       console.error("Error adding product:", error);
-      toast.error("Failed to add product");
     }
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold mb-6 text-[#007580] flex items-center">
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-md">
+      <motion.h1 
+        className="text-3xl font-bold mb-6 text-[#007580] flex items-center"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}>
         <FaPlus className="mr-2 text-xl mt-1" /> Add Product
-      </h1>
+      </motion.h1>
       <form onSubmit={handleSubmit(handleSave)} className="space-y-6">
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
@@ -109,11 +116,16 @@ const AddProductPage = () => {
             />
           </div>
         </div>
-        <Button type="submit" className="bg-[#007580] text-white hover:bg-[#005f6b] w-full flex items-center justify-center">
-          <FaSave className="mr-2" /> Save Product
-        </Button>
+        <motion.div 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}>
+          <Button type="submit" className="bg-[#007580] text-white hover:bg-[#005f6b] w-full flex items-center justify-center">
+            <FaSave className="mr-2" /> Save Product
+          </Button>
+        </motion.div>
       </form>
-    </div>
+      <ToastContainer />
+    </motion.div>
   );
 };
 

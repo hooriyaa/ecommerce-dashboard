@@ -11,7 +11,7 @@ import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 
@@ -23,7 +23,6 @@ const sanityClient = createClient({
   useCdn: false,
 });
 
-// Define Product type
 type Product = {
   _id: string;
   id: number;
@@ -36,7 +35,6 @@ type Product = {
   image: string;
 };
 
-// Define Form Data type
 type ProductFormData = {
   id: number;
   title: string;
@@ -51,8 +49,7 @@ const ProductPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const { register, handleSubmit, reset, setValue } =
-    useForm<ProductFormData>();
+  const { register, handleSubmit, reset, setValue } = useForm<ProductFormData>();
 
   useEffect(() => {
     fetchProducts();
@@ -71,13 +68,11 @@ const ProductPage = () => {
   const deleteProduct = async (productId: string) => {
     try {
       await sanityClient.transaction().delete(productId).commit();
-      toast.success("Product deleted successfully");
       fetchProducts();
+      toast.error("Product deleted successfully!");
     } catch (error: unknown) {
       console.error("Error deleting product:", error);
-      toast.error(
-        `Error deleting product: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      toast.error(`Error deleting product: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
@@ -100,11 +95,11 @@ const ProductPage = () => {
             badge: data.badge,
             description: data.description,
             inventory: Number(data.inventory),
-            image: imageRef
-              ? { asset: { _ref: imageRef } }
-              : editingProduct.image,
+            image: imageRef ? { asset: { _ref: imageRef } } : editingProduct.image,
           })
           .commit();
+
+        toast.success("Product updated successfully!");
       }
 
       setEditingProduct(null);
@@ -113,9 +108,7 @@ const ProductPage = () => {
       fetchProducts();
     } catch (error: unknown) {
       console.error("Error saving product:", error);
-      toast.error(
-        `Error saving product: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
+      toast.error(`Error saving product: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
@@ -133,35 +126,53 @@ const ProductPage = () => {
 
   return (
     <motion.div className="p-6 bg-gray-50 min-h-screen">
-    <motion.div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 text-center sm:text-left">
-      <h1 className="text-3xl text-[#007580] font-semibold">Products</h1>
-      <Link href="/admin/dashboard/add_Product" className="w-full sm:w-auto">
-        <motion.button className="bg-[#029FAE] text-white px-4 py-2 flex items-center justify-center w-full sm:w-auto hover:bg-[#007580] rounded-xl transition-all duration-300">
-          <Plus className="mr-2" /> Add Product
-        </motion.button>
-      </Link>
-    </motion.div>
+      <ToastContainer />
+      <motion.div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 text-center sm:text-left">
+        <h1 className="text-3xl text-[#007580] font-semibold">Products</h1>
+        <Link href="/admin/dashboard/add_Product" className="w-full sm:w-auto">
+          <motion.button
+            className="bg-[#029FAE] text-white px-4 py-2 flex items-center justify-center w-full sm:w-auto hover:bg-[#007580] rounded-xl transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Plus className="mr-2" /> Add Product
+          </motion.button>
+        </Link>
+      </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         {products.map((product) => (
-          <motion.div key={product._id}>
+          <motion.div key={product._id} whileHover={{ scale: 1.03 }}>
             <Card>
               <CardContent>
-                {product.image && (
-                  <Image
-                    src={urlFor(product.image).url()}
-                    alt={product.title}
-                    width={400}
-                    height={400}
-                    className="w-full h-60 object-cover rounded-lg mb-4"
-                  />
-                )}
-                <h2 className="text-[#007580] font-medium text-lg">
-                  {product.title}
-                </h2>
-                <p className="text-gray-600 font-semibold text-lg">
-                  ${product.price}
-                </p>
+                <div className="relative">
+                  {product.image && (
+                    <Image
+                      src={urlFor(product.image).url()}
+                      alt={product.title}
+                      width={400}
+                      height={400}
+                      className="w-full h-60 object-cover rounded-lg mb-4"
+                    />
+                  )}
+                  {product.badge && (
+                      <span
+                        className={`absolute top-2 left-2 text-sm font-semibold px-2 py-1 rounded text-white ${
+                          product.badge === "New"
+                            ? "bg-[#01AD5A]"
+                            : "bg-[#F5813F]"
+                        }`}
+                      >
+                        {product.badge}
+                      </span>
+                    )}
+                </div>
+                <h2 className="text-[#007580] font-medium text-lg">{product.title}</h2>
+                <p className="text-gray-600 font-semibold text-lg">${product.price}</p>
                 <div className="flex justify-between mt-4">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -173,74 +184,29 @@ const ProductPage = () => {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="bg-white p-6 sm:p-4 rounded-lg shadow-lg max-w-lg sm:max-w-sm w-full">
-                      <h2 className="text-2xl sm:text-xl font-semibold text-[#007580] mb-4">
-                        Edit Product
-                      </h2>
-                      <form
-                        onSubmit={handleSubmit(handleSave)}
-                        className="flex flex-col gap-4"
-                      >
-                        <Input
-                          type="number"
-                          placeholder="ID"
-                          {...register("id")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Input
-                          placeholder="Title"
-                          {...register("title")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Price"
-                          {...register("price")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Price Without Discount"
-                          {...register("priceWithoutDiscount")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Input
-                          placeholder="Badge"
-                          {...register("badge")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Textarea
-                          placeholder="Description"
-                          {...register("description")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Inventory"
-                          {...register("inventory")}
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580]"
-                        />
+                      <h2 className="text-2xl sm:text-xl font-semibold text-[#007580] mb-4">Edit Product</h2>
+                      <form onSubmit={handleSubmit(handleSave)} className="flex flex-col gap-4">
+                        <Input type="number" placeholder="ID" {...register("id")} />
+                        <Input placeholder="Title" {...register("title")} />
+                        <Input type="number" placeholder="Price" {...register("price")} />
+                        <Input type="number" placeholder="Price Without Discount" {...register("priceWithoutDiscount")} />
+                        <Input placeholder="Badge" {...register("badge")} />
+                        <Textarea placeholder="Description" {...register("description")} />
+                        <Input type="number" placeholder="Inventory" {...register("inventory")} />
                         <input
                           type="file"
-                          onChange={(e) =>
-                            setImageFile(e.target.files?.[0] || null)
-                          }
+                          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                           accept="image/*"
-                          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-[#007580] bg-white"
+                          className="border rounded-md p-2 w-full"
                         />
-                        <Button
-                          type="submit"
-                          className="bg-[#F5813F] text-white w-full py-2 rounded-lg hover:bg-[#d66a2e] transition-all duration-300"
-                        >
+                        <Button type="submit" className="bg-[#F5813F] text-white w-full py-2 rounded-lg hover:bg-[#d66a2e] transition-all duration-300">
                           Update Product
                         </Button>
                       </form>
                     </DialogContent>
                   </Dialog>
 
-                  <Button
-                    onClick={() => deleteProduct(product._id)}
-                    className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-                  >
+                  <Button onClick={() => deleteProduct(product._id)} className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
                     <Trash className="w-4 h-4 mr-1" /> Delete
                   </Button>
                 </div>
@@ -248,7 +214,7 @@ const ProductPage = () => {
             </Card>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
